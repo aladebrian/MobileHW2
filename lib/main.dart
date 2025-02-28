@@ -126,25 +126,30 @@ class _MyHomeState extends State<MyHome> {
   }
 
   void addExpression(value) {
-    // Holds most edge cases. If an operator is placed next to another, the previous one is
-    // replaced. If two numbers are side by side, they are concatenated. If an operator is
-    // placed with no numbers available, it is ignored.
+    // Holds most edge cases.
+    // If an operator is placed with no numbers available, it is ignored.
+    // If an operator is placed next to another, the previous one is replaced.
+    // If two numbers are side by side, they are concatenated, unless 0 is the previous.
+    // If 0 is the previous number, and a new number is added, 0 is replaced.
     if (isOperator(value)) {
       if (numbers.isEmpty) {
         return;
+      } else if (needNumber()) {
+        //Decreasing one value from text
+        text = text.substring(0, text.length - 1);
+        op.last = value;
+      } else {
+        op.add(value);
       }
-      if (needNumber()) {
-        text = text.substring(
-          0,
-          text.length - 1,
-        ); //Decreasing one value from text
-        op.removeLast();
-      }
-      op.add(value);
-    } else if (!needNumber()) {
-      numbers.last = numbers.last + value;
     } else {
-      numbers.add(value);
+      if (!needNumber() && numbers.last == "0") {
+        text = text.substring(0, text.length - 1);
+        numbers.last = value;
+      } else if (!needNumber()) {
+        numbers.last = numbers.last + value;
+      } else {
+        numbers.add(value);
+      }
     }
     setState(() {
       text += value;
