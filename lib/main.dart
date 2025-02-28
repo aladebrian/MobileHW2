@@ -91,7 +91,38 @@ class _MyHomeState extends State<MyHome> {
   }
 
   void solve() {
-
+    // Works by iterating vthrough the operator list twice. The first time is for
+    // * and /, because they have higher precedence, and the second si for + and -
+    // The moment an operator with the correct precedence is spotted, the numbers
+    // associated with it are evaluated, and the answer is stored in such a way that the
+    // next operator is able to access it. This ensures precedence between operators and
+    // direction is maintained, and that it doesn't needlessly iterate more than once.
+    if (needNumber()) {
+      return;
+    }
+    for (var precedent in [1, 0]) {
+      List<String> newNum = [];
+      List<String> newOp = [];
+      for (var i = 0; i < op.length; i++) {
+        if (operatorList[op[i]]![1] == precedent) {
+          numbers[i + 1] =
+              operatorList[op[i]]![0](
+                    int.parse(numbers[i]),
+                    int.parse(numbers[i + 1]),
+                  )
+                  .toString();
+        } else {
+          newNum.add(numbers[i]);
+          newOp.add(op[i]);
+        }
+      }
+      newNum.add(numbers.last);
+      numbers = newNum;
+      op = newOp;
+    }
+    setState(() {
+      text = numbers[0];
+    });
   }
 
   void addExpression(value) {
